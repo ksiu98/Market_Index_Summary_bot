@@ -66,18 +66,10 @@ jobs:
         REPORT_FORMAT_CONFIG: config/report_formats.json
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        MODE: ${{ env.REPORT_MODE }}  # <--- [중요] 이 줄이 추가되어야 합니다!
+        MODE: ${{ env.REPORT_MODE || 'US' }}
       run: |
-        docker run --rm \
-          -e REPORT_FORMAT_CONFIG \
-          -e TELEGRAM_BOT_TOKEN \
-          -e TELEGRAM_CHAT_ID \
-          -e MODE \               # <--- [중요] 도커 컨테이너 내부로 MODE 변수 주입
-          -v "$PWD:/app" \
-          -w /app \
-          macro-pulse:daily \
-          sh -lc "uv run --frozen python src/main.py 2>&1 | tee macro-pulse.log"      
-                      
+        docker run --rm -e REPORT_FORMAT_CONFIG -e TELEGRAM_BOT_TOKEN -e TELEGRAM_CHAT_ID -e MODE -v "$PWD:/app" -w /app macro-pulse:daily sh -lc "uv run --frozen python src/main.py 2>&1 | tee macro-pulse.log"
+
     - name: Validate generated report
       if: success()
       run: test -s macro_pulse_report.html
