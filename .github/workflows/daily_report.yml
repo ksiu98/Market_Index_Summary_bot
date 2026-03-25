@@ -2,13 +2,20 @@ name: Daily Macro Pulse Report
 
 on:
   schedule:
-    # BEGIN GENERATED SCHEDULES
     # KR | 17:00 KST | 08:00 UTC | Mon-Fri
     - cron: '00 08 * * 1-5'
     # US | 06:30 KST | 21:30 UTC | Tue-Sat KST
     - cron: '30 21 * * 1-5'
-    # END GENERATED SCHEDULES
   workflow_dispatch:
+    inputs:
+      mode:
+        description: '리포트 모드 선택 (KR 또는 US)'
+        required: true
+        default: 'US'
+        type: choice
+        options:
+          - KR
+          - US
 
 permissions:
   contents: read
@@ -31,6 +38,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
 
+    # [중요] 실행 시간에 따라 MODE를 결정하는 단계 추가
+    - name: Set Report Mode
+      id: set-mode
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "REPORT_MODE=${{ github.event.inputs.mode }}" >> $GITHUB_ENV
+        elif [ "${{ github.event.schedule }}" == "30 21 * * 1-5" ]; then
+          echo "REPORT_MODE=US" >> $GITHUB_ENV
+        else
+          echo "REPORT_MODE=KR" >> $GITHUB_ENV
+        fi
+
     - name: Build runtime image
       run: docker build -t macro-pulse:daily .
 
@@ -43,16 +62,22 @@ jobs:
           sh -lc "uv run --frozen python -m unittest discover tests 2>&1 | tee unit-test.log"
 
     - name: Run Macro Pulse Bot in Docker
+      env:
+        REPORT_FORMAT_CONFIG: config/report_formats.json
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        MODE: ${{ env.REPORT_MODE }}  # <--- [중요] 이 줄이 추가되어야 합니다!
       run: |
         docker run --rm \
           -e REPORT_FORMAT_CONFIG \
           -e TELEGRAM_BOT_TOKEN \
           -e TELEGRAM_CHAT_ID \
+          -e MODE \               # <--- [중요] 도커 컨테이너 내부로 MODE 변수 주입
           -v "$PWD:/app" \
           -w /app \
           macro-pulse:daily \
-          sh -lc "uv run --frozen python src/main.py 2>&1 | tee macro-pulse.log"
-      
+          sh -lc "uv run --frozen python src/main.py 2>&1 | tee macro-pulse.log"      
+                      
     - name: Validate generated report
       if: success()
       run: test -s macro_pulse_report.html
