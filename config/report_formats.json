@@ -1,24 +1,76 @@
 {
   "modes": {
     "KR": {
-      "description": "아시아(일/한) 마감 및 환율 중심 리포트",
-      "workflow_schedule": { "cron": "00 08 * * 1-5", "local_time": "17:00 KST" },
+      "description": "Korean market close summary focused on domestic indices, Asia peers, local bond context, and FX.",
+      "workflow_schedule": {
+        "cron": "00 08 * * 1-5",
+        "local_time": "17:00 KST",
+        "utc_time": "08:00 UTC",
+        "weekdays": "Mon-Fri"
+      },
       "summary_sections": [
-        { "title": "🇯🇵 일본 시장 (거주지)", "category": "indices_overseas", "items": ["Nikkei 225", "8058.T", "8001.T", "8031.T", "Japan 10Y Treasury"] },
-        { "title": "🇰🇷 한국 시장", "category": "indices_overseas", "items": ["KOSPI", "KOSDAQ", "JPY/KRW"] },
-        { "title": "💵 환율 및 지수 (참고)", "category": "exchange", "items": ["USD/JPY", "S&P 500", "Nasdaq"] }
+        {
+          "title": "국내 증시",
+          "category": "indices_domestic",
+          "items": ["KOSPI", "KOSDAQ"]
+        },
+        {
+          "title": "해외 증시",
+          "category": "indices_overseas",
+          "items": ["Nikkei 225", "Hang Seng", "Shanghai Composite"]
+        },
+        {
+          "title": "변동성",
+          "category": "volatility",
+          "items": ["VKOSPI", "VIX"]
+        },
+        {
+          "title": "채권",
+          "category": "commodities_rates",
+          "items": ["Japan 10Y Treasury", "Korea 10Y Treasury"]
+        },
+        {
+          "title": "환율",
+          "category": "exchange",
+          "items": ["USD/KRW", "JPY/KRW"]
+        }
       ],
-      "screenshot_targets": ["nikkei225", "kospi"]
+      "screenshot_targets": ["kospi", "kosdaq"]
     },
     "US": {
-      "description": "미국 시장 마감 및 보유 자산 중심 리포트",
-      "workflow_schedule": { "cron": "30 21 * * 1-5", "local_time": "06:30 KST" },
+      "description": "US market close summary focused on US and European indices, commodities, crypto, and broad risk assets.",
+      "workflow_schedule": {
+        "cron": "30 21 * * 1-5",
+        "local_time": "06:30 KST",
+        "utc_time": "21:30 UTC",
+        "weekdays": "Tue-Sat KST"
+      },
       "summary_sections": [
-        { "title": "🇺🇸 미국 시장 지수", "category": "indices_overseas", "items": ["S&P 500", "Nasdaq", "VIX", "US 10Y Treasury"] },
-        { "title": "🚀 M7 빅테크 (성장주)", "category": "stocks", "items": ["Tesla", "Alphabet-C", "NVIDIA", "Microsoft", "Apple", "Amazon", "Meta Platforms"] },
-        { "title": "💰 배당 및 인컴 (US/JP)", "category": "stocks", "items": ["SCHD", "JEPQ", "JEPI", "8058.T", "8001.T"] },
-        { "title": "⚖️ 레버리지 & 헷지", "category": "stocks", "items": ["TQQQ", "SQQQ", "Bitcoin"] },
-        { "title": "🌏 아시아 지수 (참고)", "category": "indices_overseas", "items": ["Nikkei 225", "KOSPI", "USD/JPY"] }
+        {
+          "title": "해외 증시",
+          "category": "indices_overseas",
+          "items": ["S&P 500", "Nasdaq", "Euro Stoxx 50"]
+        },
+        {
+          "title": "변동성",
+          "category": "volatility",
+          "items": ["VKOSPI", "VIX"]
+        },
+        {
+          "title": "채권, 원자재",
+          "category": "commodities_rates",
+          "items": ["US 10Y Treasury", "Gold", "Silver", "Copper"]
+        },
+        {
+          "title": "환율",
+          "category": "exchange",
+          "items": ["USD/KRW", "JPY/KRW"]
+        },
+        {
+          "title": "암호화폐",
+          "category": "crypto",
+          "items": ["Bitcoin", "Ethereum"]
+        }
       ],
       "screenshot_targets": ["finviz"]
     }
